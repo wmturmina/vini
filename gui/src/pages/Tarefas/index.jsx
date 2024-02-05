@@ -195,6 +195,7 @@ export default function Tarefas() {
   const filterList = selectedList || _.get(lists, '[0]', '');
 
   const filteredTasks = _.filter(tasks, (task) => task.list._id === filterList._id);
+  
   return (
     <div style={{ marginTop: '84px', paddingLeft: '10px', paddingRight: '10px' }}>
       <Box>
