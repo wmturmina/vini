@@ -42,12 +42,11 @@ export default () => {
     };
     try {
       if (idListToEdit) {
-        const { data } = await API.put(`/lists/${_.get(selectedList, '_id')}/`, payload, {
+        await API.put(`/lists/${_.get(selectedList, '_id')}/`, payload, {
           headers: {
             Authorization: `${_.get(loggedInUser, 'apiKey')}`,
           },
         });
-        setSelectedList(data.response);
       } else {
         const { data } = await API.post('/lists/', payload, {
           headers: {
