@@ -108,7 +108,7 @@ function FormNewTask({ tarefa, handlerCancel, handlerSave }) {
   );
 }
 
-function Tarefa({ editing, tarefa, handlerEdit, handlerDelete, handlerDone, color }) {
+function Tarefa({ editing, tarefa, handlerEdit, handlerDelete, handlerDone, handlerClose, color }) {
   const disabled = tarefa.status ? { opacity: 0.25 } : {};
   return (
     <Grid
@@ -127,6 +127,7 @@ function Tarefa({ editing, tarefa, handlerEdit, handlerDelete, handlerDone, colo
         xs={10}
         onDoubleClick={() => {
           handlerEdit(tarefa);
+          handlerClose(true);
         }}
       >
         <Typography variant="h6" style={disabled}>
@@ -257,6 +258,7 @@ export default function Tarefas() {
                     handlerDelete={deleteTask}
                     handlerDone={saveTask}
                     handlerEdit={setTaskToEdit}
+                    handlerClose={setNewTask}
                   />
                 );
               }
@@ -271,7 +273,7 @@ export default function Tarefas() {
                 />
               );
             })}
-          {newTask && (
+          {newTask && !taskToEdit._id && (
             <FormNewTask
               tarefa={{
                 title: '',
