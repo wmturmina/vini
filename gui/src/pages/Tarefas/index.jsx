@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable no-underscore-dangle */
 import React, { useState, useEffect } from 'react';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -17,11 +18,11 @@ import Checkbox from '@mui/material/Checkbox';
 import Typography from '@mui/material/Typography';
 import _ from 'lodash';
 
-import API from '../../services/connection';
-import { useUser } from '../../context/UserStore';
+import useList from './useList';
+import useTask from './useTask';
 
-function FormNewList ({value, showDelete, handlerDelete, handlerCancel, handlerSave}) {
-  const [localValue, setLocalValue] = useState(value)
+function FormNewList({ value, showDelete, handlerDelete, handlerCancel, handlerSave }) {
+  const [localValue, setLocalValue] = useState(value);
   return (
     <div
       style={{
@@ -51,16 +52,20 @@ function FormNewList ({value, showDelete, handlerDelete, handlerCancel, handlerS
       )}
     </div>
   );
-};
+}
 
-function FormNewTask({ title, description, handlerCancel, handlerSave }) {
-  const [localTitle, setLocalTitle] = useState(title)
-  const [localDescrption, setocalDescrption] = useState(description)
+function FormNewTask({ tarefa, handlerCancel, handlerSave }) {
+  const [localTitle, setLocalTitle] = useState(tarefa.title);
+  const [localDescrption, setLocalDescrption] = useState(tarefa.description);
   return (
-    <Grid style={{ margin:'10px' }} container spacing={1}
+    <Grid
+      style={{ margin: '10px' }}
+      container
+      spacing={1}
       direction="row"
       justifyContent="space-between"
-      alignItems="flex-end">
+      alignItems="flex-end"
+    >
       <Grid xs>
         <TextField
           label="Titulo"
@@ -76,35 +81,54 @@ function FormNewTask({ title, description, handlerCancel, handlerSave }) {
           label="Descrição"
           size="small"
           fullWidth
-          autoFocus
           value={localDescrption}
-          onChange={(e) => setocalDescrption(e.target.value)}
+          onChange={(e) => setLocalDescrption(e.target.value)}
         />
       </Grid>
       <Grid xs="auto">
-      <IconButton onClick={() => handlerSave(localTitle, localDescrption)} color="primary">
-        <CheckCircleIcon />
-      </IconButton>
-      <IconButton onClick={() => handlerCancel()} color="primary">
-        <CancelIcon />
-      </IconButton>
+        <IconButton
+          onClick={() =>
+            handlerSave({
+              ...tarefa,
+              title: localTitle,
+              description: localDescrption,
+              status: tarefa.status,
+              list: tarefa.list,
+            })
+          }
+          color="primary"
+        >
+          <CheckCircleIcon />
+        </IconButton>
+        <IconButton onClick={() => handlerCancel()} color="primary">
+          <CancelIcon />
+        </IconButton>
       </Grid>
     </Grid>
   );
-};
+}
 
-
-function Tarefa({ tarefa, handlerEdit, handlerDelete, handlerDone, color }) {
-  const disabled = tarefa.status ? {opacity: 0.25} : {}
+function Tarefa({ editing, tarefa, handlerEdit, handlerDelete, handlerDone, color }) {
+  const disabled = tarefa.status ? { opacity: 0.25 } : {};
   return (
-    <Grid style={{ paddingLeft: "10px", paddingRight: "10px",  backgroundColor: color ? 'rgba(196, 165, 116, 0.12)' : 'inherit' }} container spacing={1}
+    <Grid
+      style={{
+        paddingLeft: '10px',
+        paddingRight: '10px',
+        backgroundColor: color ? 'rgba(196, 165, 116, 0.12)' : 'inherit',
+      }}
+      container
+      spacing={1}
       direction="row"
       justifyContent="space-between"
       alignItems="flex-end"
-      onDoubleClick={() => {
-        handlerEdit(tarefa._id);
-      }}>
-      <Grid xs={10}>
+    >
+      <Grid
+        xs={10}
+        onDoubleClick={() => {
+          handlerEdit(tarefa);
+        }}
+      >
         <Typography variant="h6" style={disabled}>
           {tarefa.title}
         </Typography>
@@ -115,131 +139,66 @@ function Tarefa({ tarefa, handlerEdit, handlerDelete, handlerDone, color }) {
       <Grid xs="auto">
         <Checkbox
           checked={tarefa.status}
-          onChange={(e) => handlerDone(e.target.checked)}
+          onChange={(e) =>
+            handlerDone({
+              ...tarefa,
+              status: e.target.checked,
+            })
+          }
+          disabled={editing}
         />
-        <IconButton onClick={() => handlerDelete()} color="primary">
+        <IconButton onClick={() => handlerDelete(tarefa._id)} color="primary" disabled={editing}>
           <DeleteIcon />
         </IconButton>
       </Grid>
     </Grid>
   );
-};
+}
 
 export default function Tarefas() {
-  const { loggedInUser } = useUser();
-  const [lists, setLists] = useState([]);
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [value, setValue] = useState(0);
-  const [selectedList, setSelectedList] = useState('');
-  const [idListToEdit, setIdListToEdit] = useState('');
-  const [newList, setNewList] = useState(false);
-  const [editListText, setEditListText] = useState('');
-
-  const getLists = async () => {
-    setLoading(true);
-    try {
-      const { data } = await API.get('lists', {
-        headers: {
-          Authorization: `${_.get(loggedInUser, 'apiKey')}`,
-        },
-      });
-      setLists(data);
-    } catch (err) {
-      console.warn(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-  const getTasks = async () => {
-    setLoading(true);
-    try {
-      const { data } = await API.get('tasks', {
-        headers: {
-          Authorization: `${_.get(loggedInUser, 'apiKey')}`,
-        },
-      });
-      setTasks(data);
-    } catch (err) {
-      console.warn(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const cancelNewList = () => {
-    setNewList(false);
-    setEditListText('');
-    setIdListToEdit('');
-  };
-
-  const saveList = async (listText) => {
-    const payload = {
-      name: listText,
-    };
-    try {
-      if (idListToEdit) {
-        const { data } = await API.put(`/lists/${selectedList}/`, payload, {
-          headers: {
-            Authorization: `${_.get(loggedInUser, 'apiKey')}`,
-          },
-        });
-        setSelectedList(data.response._id);
-      } else {
-        const { data } = await API.post('/lists/', payload, {
-          headers: {
-            Authorization: `${_.get(loggedInUser, 'apiKey')}`,
-          },
-        });
-        setSelectedList(data.response._id);
-        setValue(lists.length);
-      }
-      getLists();
-    } catch (err) {
-      console.warn(err);
-    } finally {
-      cancelNewList();
-    }
-  };
-
-  const deleteList = async () => {
-    try {
-      if (idListToEdit) {
-        await API.delete(`/lists/${idListToEdit}/`, {
-          headers: {
-            Authorization: `${_.get(loggedInUser, 'apiKey')}`,
-          },
-        });
-        getLists();
-        setValue(0);
-      }
-    } catch (err) {
-      console.warn(err);
-    } finally {
-      cancelNewList();
-    }
-  };
-
-
-
-  const handleChange = (event, newValue) => {
-    setSelectedList(lists[newValue]._id);
-    setValue(newValue);
-  };
+  const {
+    value,
+    loadingList,
+    lists,
+    selectedList,
+    idListToEdit,
+    newList,
+    editListText,
+    handleChangeList,
+    getLists,
+    deleteList,
+    saveList,
+    cancelNewList,
+    setEditListText,
+    setIdListToEdit,
+    setNewList,
+  } = useList();
+  const {
+    loadingTask,
+    tasks,
+    taskToEdit,
+    newTask,
+    getTasks,
+    deleteTask,
+    saveTask,
+    cancelNewTask,
+    setTaskToEdit,
+    setNewTask,
+  } = useTask();
 
   useEffect(() => {
     getLists();
     getTasks();
   }, []);
 
-  const filterList = selectedList || _.get(lists, '[0]._id', '');
+  const filterList = selectedList || _.get(lists, '[0]', '');
 
-  const filteredTasks = _.filter(tasks, (task) => task.list._id === filterList);
+  const filteredTasks = _.filter(tasks, (task) => task.list._id === filterList._id);
   return (
     <div style={{ marginTop: '84px', paddingLeft: '10px', paddingRight: '10px' }}>
       <Box>
         <Paper>
-          <Tabs value={newList ? -1 : value} onChange={handleChange}>
+          <Tabs value={newList ? -1 : value} onChange={handleChangeList}>
             {_.map(lists, (list) => {
               if (list._id !== idListToEdit) {
                 return (
@@ -255,13 +214,15 @@ export default function Tarefas() {
                   />
                 );
               }
-              return <FormNewList
-                value={editListText}
-                showDelete={!idListToEdit}
-                handlerDelete={deleteList}
-                handlerCancel={cancelNewList}
-                handlerSave={saveList}
-              />;
+              return (
+                <FormNewList
+                  value={editListText}
+                  showDelete={!idListToEdit}
+                  handlerDelete={deleteList}
+                  handlerCancel={cancelNewList}
+                  handlerSave={saveList}
+                />
+              );
             })}
             {newList && !idListToEdit && <FormNewList />}
             {!newList && (
@@ -270,7 +231,7 @@ export default function Tarefas() {
               </IconButton>
             )}
           </Tabs>
-          {loading && (
+          {(loadingList || loadingTask) && (
             <div
               style={{
                 paddingLeft: '50%',
@@ -283,15 +244,55 @@ export default function Tarefas() {
               <CircularProgress />
             </div>
           )}
-          {!loading &&
+          {!loadingTask &&
             tasks.length > 0 &&
-            _.map(filteredTasks, (task, index) => (
-              <Tarefa tarefa={task} key={task._id} color={index % 2 === 0} />
-            ))}
-          <FormNewTask />
-          <Button variant="contained" color="secondary" sx={{ width: '100%' }}>
-            Nova tarefa
-          </Button>
+            _.map(filteredTasks, (task, index) => {
+              if (task._id !== taskToEdit._id) {
+                return (
+                  <Tarefa
+                    editing={newTask}
+                    tarefa={task}
+                    key={task._id}
+                    color={index % 2 === 0}
+                    handlerDelete={deleteTask}
+                    handlerDone={saveTask}
+                    handlerEdit={setTaskToEdit}
+                  />
+                );
+              }
+              return (
+                <FormNewTask
+                  tarefa={{
+                    ...taskToEdit,
+                    list: filterList,
+                  }}
+                  handlerCancel={cancelNewTask}
+                  handlerSave={saveTask}
+                />
+              );
+            })}
+          {newTask && (
+            <FormNewTask
+              tarefa={{
+                title: '',
+                description: '',
+                status: false,
+                list: filterList,
+              }}
+              handlerCancel={cancelNewTask}
+              handlerSave={saveTask}
+            />
+          )}
+          {!newTask && (
+            <Button
+              variant="contained"
+              color="secondary"
+              sx={{ width: '100%' }}
+              onClick={() => setNewTask(true)}
+            >
+              Nova tarefa
+            </Button>
+          )}
         </Paper>
       </Box>
     </div>
