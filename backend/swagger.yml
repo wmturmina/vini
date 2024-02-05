@@ -1,0 +1,751 @@
+openapi: 3.0.3
+info:
+  title: Swagger Task Killer - OpenAPI 3.0
+  description: |-
+    Este é um servidor para o Task Killer baseado na especificação OpenAPI 3.0.
+
+    _As rotas são baseadas em 3 models: listas, tarefas e o controle de usuarios._
+    
+    Links:
+    - [GitHub - Task Killer](https://github.com/vghessel/taskKiller)
+    - [Arquivo swagger.yaml no repositório](https://github.com/vghessel/taskKiller/blob/main/backend/swagger.yml)
+  contact:
+    email: vgerlachhessel@gmail.com
+  version: 1.0.11
+servers:
+  - url: http://localhost:3000
+tags:
+  - name: tarefas
+    description: Tudo sobre as tarefas
+  - name: listas
+    description: Tudo sobre as listas de tarefas
+  - name: usuários
+    description: Operações de login e signup
+paths:
+  /api/tasks:
+    get:
+      tags:
+        - tarefas
+      summary: Obter todas as tarefas
+      description: Obtenha todas as tarefas sem filtro por ID
+      parameters:
+        - name: JWT
+          in: header
+          description: 'Json Web Token'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Operação efetuada com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TarefaGetResponse'
+    post:
+      tags:
+        - tarefas
+      summary: Criar tarefa
+      description: Crie uma tarefa enviando as informações necessárias
+      parameters:
+        - name: JWT
+          in: header
+          description: 'Json Web Token'
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TarefaPost'
+      responses:
+        '200':
+          description: Operação realizada com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TarefaPostResponse'
+        '400':
+          description: Invalid input
+  /api/tasks/{taskId}:
+    get:
+      tags:
+        - tarefas
+      summary: Obter uma tarefa pelo ID
+      description: Obtenha uma tarefa enviando o ID através da URL
+      parameters:
+        - name: taskId
+          in: path
+          description: ID da tarefa que deseja buscar
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: JWT
+          in: header
+          description: 'Json Web Token'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Operação efetuada com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TarefaGetTaskResponse'          
+        '400':
+          description: ID inválido
+        '404':
+          description: Tarefa não encontrada
+    put:
+      tags:
+        - tarefas
+      summary: Atualizar uma tarefa existente pelo ID
+      description: Atualize uma tarefa existente alterando os campos desejados
+      parameters:
+        - name: taskId
+          in: path
+          description: ID da tarefa que deseja atualizar
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: JWT
+          in: header
+          description: 'Json Web Token'
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Atualize uma tarefa já existente dentro de uma lista
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TarefaPut'
+      responses:
+        '200':
+          description: Operação efetuada com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TarefaPutResponse'          
+        '400':
+          description: ID inválido
+        '404':
+          description: Tarefa não encontrada
+    delete:
+      tags:
+        - tarefas
+      summary: Excluir uma tarefa pelo ID
+      description: Exclue uma tarefa enviando o ID através da URL
+      parameters:
+        - name: taskId
+          in: path
+          description: ID da tarefa que deseja deletar
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: JWT
+          in: header
+          description: 'Json Web Token'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Tarefa excluída com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TarefaDeleteResponse'          
+        '400':
+          description: ID inválido
+        '404':
+          description: Tarefa não encontrada
+  /api/lists:
+    get:
+      tags:
+        - listas
+      summary: Obter todas as listas de tarefas
+      description: Obtenha todas as listas sem filtro por I
+      parameters:
+        - name: JWT
+          in: header
+          description: 'Json Web Token'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Operação efetuada com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListaGetResponse'
+    post:
+      tags:
+        - listas
+      summary: Criar lista
+      description: Crie uma lista enviando as informações necessárias
+      parameters:
+        - name: JWT
+          in: header
+          description: 'Json Web Token'
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListaPostPut'
+      responses:
+        '200':
+          description: Operação realizada com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListaPostResponse'
+        '400':
+          description: Invalid input
+  /api/lists/{listId}:
+    get:
+      tags:
+        - listas
+      summary: Obter uma lista pelo ID
+      description: Obtenha uma lista enviando o ID através da URL
+      parameters:
+        - name: listId
+          in: path
+          description: ID da lista que deseja buscar
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: JWT
+          in: header
+          description: 'Json Web Token'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Operação efetuada com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListaGetListResponse'          
+        '400':
+          description: ID inválido
+        '404':
+          description: Lista não encontrada
+    put:
+      tags:
+        - listas
+      summary: Atualizar uma lista existente pelo ID
+      description: Atualize uma lista existente alterando os campos desejados
+      parameters:
+        - name: listId
+          in: path
+          description: ID da lista que deseja atualizar
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: JWT
+          in: header
+          description: 'Json Web Token'
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Atualize uma lista já existente
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListaPostPut'
+      responses:
+        '200':
+          description: Operação efetuada com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListaPutResponse'          
+        '400':
+          description: ID inválido
+        '404':
+          description: Lista não encontrada
+    delete:
+      tags:
+        - listas
+      summary: Excluir uma lista pelo ID
+      description: Exclue uma lista enviando o ID através da URL
+      parameters:
+        - name: listId
+          in: path
+          description: ID da lista que deseja deletar
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: JWT
+          in: header
+          description: 'Json Web Token'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista excluída com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListaDeleteResponse'          
+        '400':
+          description: ID inválido
+        '404':
+          description: Lista não encontrada
+  /api/signup:
+    post:
+      tags:
+        - usuários
+      summary: Criar um usuário
+      description: Crie um novo usuário
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioLoginSignup'
+      responses:
+        '200':
+          description: Usuário cadastrado com sucesso!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioSignupResponse'
+        '400':
+          description: Invalid input
+  /api/login:
+    post:
+      tags:
+        - usuários
+      summary: Fça login com um usuário
+      description: Faça login com um usuário
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioLoginSignup'
+      responses:
+        '200':
+          description: Login bem-sucedido!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioLoginResponse'
+        '401':
+          description: Credenciais inválidas
+        '400':
+          description: Invalid input
+components:
+  schemas:
+    TarefaPost:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Criar um novo projeto
+        description:
+          type: string
+          example: Criar um projeto para divulgar nas redes sociais
+        status:
+          type: boolean
+          example: false
+        list:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Planos 2024
+    TarefaPut:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Criar um novo projeto
+        description:
+          type: string
+          example: Criar um projeto para divulgar nas redes sociais
+        status:
+          type: boolean
+          example: false
+    TarefaGetResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          _id:
+            type: string
+            example: "65a459e4ccfe40e10dfeeb05"
+          title:
+            type: string
+            example: Título da Tarefa
+          description:
+            type: string
+            example: Descrição da Tarefa
+          status:
+            type: boolean
+            example: false
+          list:
+            type: object
+            properties:
+              name:
+                type: string
+                example: estudo
+              _id:
+                type: string
+                example: "65a4554c126868304be1b976"
+              createdAt:
+                type: string
+                format: date-time
+                example: "2024-01-14T21:42:36.004Z"
+              updatedAt:
+                type: string
+                format: date-time
+                example: "2024-01-14T22:02:12.892Z"
+              __v:
+                type: integer
+                example: 0
+          createdAt:
+            type: string
+            format: date-time
+            example: "2024-01-14T22:02:12.893Z"
+          updatedAt:
+            type: string
+            format: date-time
+            example: "2024-01-14T22:02:12.893Z"
+          __v:
+            type: integer
+            example: 0
+    TarefaGetTaskResponse:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "65a459e4ccfe40e10dfeeb05"
+        title:
+          type: string
+          example: Título da Tarefa
+        description:
+          type: string
+          example: Descrição da Tarefa
+        status:
+          type: boolean
+          example: false
+        list:
+          type: object
+          properties:
+            name:
+              type: string
+              example: estudo
+            _id:
+              type: string
+              example: "65a4554c126868304be1b976"
+            createdAt:
+              type: string
+              format: date-time
+              example: "2024-01-14T21:42:36.004Z"
+            updatedAt:
+              type: string
+              format: date-time
+              example: "2024-01-14T22:02:12.892Z"
+            __v:
+              type: integer
+              example: 0
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-01-14T22:02:12.893Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2024-01-14T22:02:12.893Z"
+        __v:
+          type: integer
+          example: 0
+    TarefaPostResponse:
+      type: object
+      properties:
+        response:
+          type: object
+          properties:
+            title:
+              type: string
+              example: Comprar carro
+            description:
+              type: string
+              example: Descrição da Tarefa
+            status:
+              type: boolean
+              example: false
+            list:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: compra
+                _id:
+                  type: string
+                  example: "65a45d1c53fc235974a1a2e5"
+                createdAt:
+                  type: string
+                  format: date-time
+                  example: "2024-01-14T22:15:56.649Z"
+                updatedAt:
+                  type: string
+                  format: date-time
+                  example: "2024-01-28T20:49:27.646Z"
+                __v:
+                  type: integer
+                  example: 0
+            _id:
+              type: string
+              example: "65b6bdd75702dd0567880a41"
+            createdAt:
+              type: string
+              format: date-time
+              example: "2024-01-28T20:49:27.646Z"
+            updatedAt:
+              type: string
+              format: date-time
+              example: "2024-01-28T20:49:27.646Z"
+            __v:
+              type: integer
+              example: 0
+        msg:
+          type: string
+          example: Tarefa criada com sucesso!
+    TarefaPutResponse:
+      type: object
+      properties:
+        task:
+          type: object
+          properties:
+            title:
+              type: string
+              example: comprar carro seminovo
+            description:
+              type: string
+              example: comprar carro
+            status:
+              type: boolean
+              example: true
+        msg:
+          type: string
+          example: Tarefa atualizada com sucesso!
+    TarefaDeleteResponse:
+      type: object
+      properties:
+        deletedTask:
+          type: object
+          properties:
+            _id:
+              type: string
+              example: "65a459e4ccfe40e10dfeeb05"
+            title:
+              type: string
+              example: comprar carro seminovo
+            description:
+              type: string
+              example: comprar carro
+            status:
+              type: boolean
+              example: true
+            list:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: estudo
+                _id:
+                  type: string
+                  example: "65a4554c126868304be1b976"
+                createdAt:
+                  type: string
+                  format: date-time
+                  example: "2024-01-14T21:42:36.004Z"
+                updatedAt:
+                  type: string
+                  format: date-time
+                  example: "2024-01-14T22:02:12.892Z"
+                __v:
+                  type: integer
+                  example: 0
+            createdAt:
+              type: string
+              format: date-time
+              example: "2024-01-14T22:02:12.893Z"
+            updatedAt:
+              type: string
+              format: date-time
+              example: "2024-01-28T20:52:30.217Z"
+            __v:
+              type: integer
+              example: 0
+        msg:
+          type: string
+          example: Tarefa excluída com sucesso
+    ListaPostPut:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Planos 2024
+    ListaGetResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          _id:
+            type: string
+            example: "65a45d1c53fc235974a1a2e5"
+          name:
+            type: string
+            example: compra
+          createdAt:
+            type: string
+            format: date-time
+            example: "2024-01-14T22:15:56.649Z"
+          updatedAt:
+            type: string
+            format: date-time
+            example: "2024-01-14T22:21:19.309Z"
+          __v:
+            type: integer
+            example: 0
+    ListaGetListResponse:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "65a45d1c53fc235974a1a2e5"
+        name:
+          type: string
+          example: compra
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-01-14T22:15:56.649Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2024-01-14T22:21:19.309Z"
+        __v:
+          type: integer
+          example: 0
+    ListaPostResponse:
+      type: object
+      properties:
+        response:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Planos 2024
+            _id:
+              type: string
+              example: "65b6c0c15702dd0567880a49"
+            createdAt:
+              type: string
+              format: date-time
+              example: "2024-01-28T21:01:53.547Z"
+            updatedAt:
+              type: string
+              format: date-time
+              example: "2024-01-28T21:01:53.547Z"
+            __v:
+              type: integer
+              example: 0
+        msg:
+          type: string
+          example: Lista criada com sucesso!
+    ListaPutResponse:
+      type: object
+      properties:
+        list:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Planos 2025
+        msg:
+          type: string
+          example: Lista atualizada com sucesso!
+    ListaDeleteResponse:
+      type: object
+      properties:
+        deletedList:
+          type: object
+          properties:
+            _id:
+              type: string
+              example: "65b6c0c15702dd0567880a49"
+            name:
+              type: string
+              example: Planos 2025
+            createdAt:
+              type: string
+              format: date-time
+              example: "2024-01-28T21:01:53.547Z"
+            updatedAt:
+              type: string
+              format: date-time
+              example: "2024-01-28T21:04:18.109Z"
+            __v:
+              type: integer
+              example: 0
+        msg:
+          type: string
+          example: Lista excluída com sucesso
+    UsuarioLoginSignup:
+      type: object
+      properties:
+        username:
+          type: string
+          example: vhessel
+        password:
+          type: string
+          example: 1234
+    UsuarioSignupResponse:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            username:
+              type: string
+              example: wendell
+            password:
+              type: string
+              example: "$2b$10$IAFjjrW3WfWH3Q8GwXMFaOU"
+            _id:
+              type: string
+              example: "65b6c2705702dd0567880a4f"
+            __v:
+              type: integer
+              example: 0
+        msg:
+          type: string
+          example: Usuário cadastrado com sucesso!
+    UsuarioLoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiI4343dbbgbgg"
+        msg:
+          type: string
+          example: Login bem-sucedido!

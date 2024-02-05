@@ -1,0 +1,89 @@
+GET http://localhost:3000/api/tasks
+Authorization: TokenJWT
+
+###
+GET http://localhost:3000/api/tasks/65a09bd381aec7f7bbffebfa
+Authorization: TokenJWT
+
+###
+POST http://localhost:3000/api/tasks
+Content-Type: application/json
+Authorization: TokenJWT
+
+{
+    "title": "Título da Tarefa",
+    "description": "Descrição da Tarefa",
+    "status": false,
+    "list": {
+        "name": "estudo"
+    }
+}
+
+
+###
+PUT http://localhost:3000/api/tasks/65a09bd381aec7f7bbffebfa
+Content-Type: application/json
+Authorization: TokenJWT
+
+{
+    "title": "fazer projetos",
+    "description": "projeto da faculdade",
+    "status": false
+}
+
+
+###
+DELETE http://localhost:3000/api/tasks/65a0649ad2815b62c3a25d1a
+Authorization: TokenJWT
+
+
+###
+POST http://localhost:3000/api/lists
+Content-Type: application/json
+Authorization: TokenJWT
+
+{
+    "name": "compras"
+}
+
+
+###
+GET http://localhost:3000/api/lists
+Authorization: TokenJWT
+
+###
+GET http://localhost:3000/api/lists/65a4554c126868304be1b976
+Authorization: TokenJWT
+
+###
+DELETE http://localhost:3000/api/lists/65a4554c126868304be1b976
+Authorization: TokenJWT
+
+###
+PUT http://localhost:3000/api/lists/65a45d1c53fc235974a1a2e5
+Content-Type: application/json
+Authorization: TokenJWT
+
+{
+    "name": "compra"
+}
+
+
+
+###
+POST http://localhost:3000/api/signup
+Content-Type: application/json
+
+{
+    "username": "vhessel",
+    "password": "1234"
+}
+
+###
+POST http://localhost:3000/api/login
+Content-Type: application/json
+
+{
+    "username": "vhessel",
+    "password": "1234"
+}
