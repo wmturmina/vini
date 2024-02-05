@@ -218,14 +218,20 @@ export default function Tarefas() {
               return (
                 <FormNewList
                   value={editListText}
-                  showDelete={!idListToEdit}
+                  showDelete={idListToEdit}
                   handlerDelete={deleteList}
                   handlerCancel={cancelNewList}
                   handlerSave={saveList}
                 />
               );
             })}
-            {newList && !idListToEdit && <FormNewList />}
+            {newList && !idListToEdit && <FormNewList
+              value={editListText}
+              showDelete={false}
+              handlerDelete={deleteList}
+              handlerCancel={cancelNewList}
+              handlerSave={saveList}
+            />}
             {!newList && (
               <IconButton onClick={() => setNewList(true)} color="primary">
                 <AddCircleIcon />
@@ -251,7 +257,7 @@ export default function Tarefas() {
               if (task._id !== taskToEdit._id) {
                 return (
                   <Tarefa
-                    editing={newTask}
+                    editing={newTask || newList}
                     tarefa={task}
                     key={task._id}
                     color={index % 2 === 0}
@@ -285,7 +291,7 @@ export default function Tarefas() {
               handlerSave={saveTask}
             />
           )}
-          {!newTask && (
+          {!newTask && !newList && (
             <Button
               variant="contained"
               color="secondary"
