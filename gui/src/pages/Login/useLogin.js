@@ -8,14 +8,12 @@ export default () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loginStatus, setLoginStatus] = useState(true);
-
+  const [showPassword, setShowPassword] = useState(false);
   const [errorInLogin, setErrorInLogin] = useState('');
 
   const { changeLoggedInUser } = useUser();
 
   const navigate = useNavigate();
-
-  const [showPassword, setShowPassword] = useState(false);
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);

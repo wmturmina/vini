@@ -37,10 +37,7 @@ export default function Login() {
     <Style.Container>
       <Style.Left>
         <Style.LeftContainer>
-          <Logo height="50px" />
-          <div className="text">
-            <h1 className="title">Task Killer</h1>
-          </div>
+          <Logo height="80px" />
         </Style.LeftContainer>
       </Style.Left>
       <Style.Right>
