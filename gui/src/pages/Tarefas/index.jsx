@@ -195,7 +195,7 @@ export default function Tarefas() {
   const filterList = selectedList || _.get(lists, '[0]', '');
 
   const filteredTasks = _.filter(tasks, (task) => task.list._id === filterList._id);
-  
+
   return (
     <div style={{ marginTop: '84px', paddingLeft: '10px', paddingRight: '10px' }}>
       <Box>
@@ -226,13 +226,15 @@ export default function Tarefas() {
                 />
               );
             })}
-            {newList && !idListToEdit && <FormNewList
-              value={editListText}
-              showDelete={false}
-              handlerDelete={deleteList}
-              handlerCancel={cancelNewList}
-              handlerSave={saveList}
-            />}
+            {newList && !idListToEdit && (
+              <FormNewList
+                value={editListText}
+                showDelete={false}
+                handlerDelete={deleteList}
+                handlerCancel={cancelNewList}
+                handlerSave={saveList}
+              />
+            )}
             {!newList && (
               <IconButton onClick={() => setNewList(true)} color="primary">
                 <AddCircleIcon />

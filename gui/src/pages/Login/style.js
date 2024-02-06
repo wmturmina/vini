@@ -14,8 +14,7 @@ export const Left = styled.div`
 `;
 
 export const LeftContainer = styled.aside`
-  margin: 30px 70px;
-  margin-top: 50%;
+  margin: 100px 70px;
   height: calc(100% - 60px);
 
   .text {

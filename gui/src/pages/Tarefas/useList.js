@@ -74,7 +74,7 @@ export default () => {
         });
         getLists();
         setValue(0);
-        setSelectedList(undefined)
+        setSelectedList(undefined);
       }
     } catch (err) {
       console.warn(err);
